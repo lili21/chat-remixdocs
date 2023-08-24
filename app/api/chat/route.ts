@@ -18,12 +18,9 @@ const openAiKey = process.env.OPENAI_KEY
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-
 const openai = new OpenAI({
   apiKey: openAiKey,
 })
-
-const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
 // export const runtime = 'edge'
 
@@ -40,17 +37,17 @@ export async function POST(req: NextRequest) {
     if (!supabaseServiceKey) {
       throw new ApplicationError('Missing environment variable SUPABASE_SERVICE_ROLE_KEY')
     }
-    const requestData = await req.json()
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
-    console.log('----- request data ---', requestData)
+    const requestData = await req.json()
 
     if (!requestData) {
       throw new UserError('Missing request data')
     }
 
-    const { messages } = requestData;
+    const { messages } = requestData
 
-    const query = messages[messages.length - 1].content;
+    const query = messages[messages.length - 1].content
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
@@ -134,7 +131,6 @@ export async function POST(req: NextRequest) {
       temperature: 0,
       stream: true,
     })
-
 
     // const encoder = new TextEncoder()
 
