@@ -1,10 +1,14 @@
+'use client'
+
 import { useChat } from 'ai/react'
 import Message from './Message.tsx'
 import { Input } from './ui/input.tsx'
 import { Send } from 'lucide-react'
 
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat()
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: process.env.NODE_ENV === 'development' ? '/api/chat-dev' : '/api/chat'
+  })
 
   return (
     <div className="w-full flex-1 relative">

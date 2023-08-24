@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
 import GPT3Tokenizer from 'gpt3-tokenizer'
+import { OpenAIStream, StreamingTextResponse } from 'ai'
 // import {
 //   Configuration,
 //   OpenAIApi,
@@ -24,6 +25,8 @@ const openai = new OpenAI({
   apiKey: openAiKey,
   httpAgent: agent,
 })
+
+const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
 
 // export const runtime = 'edge'
 
@@ -48,13 +51,9 @@ export async function POST(req: NextRequest) {
       throw new UserError('Missing request data')
     }
 
-    const { prompt: query } = requestData
+    const { messages } = requestData;
 
-    if (!query) {
-      throw new UserError('Missing query in request data')
-    }
-
-    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
+    const query = messages[messages.length - 1].content;
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
@@ -113,8 +112,8 @@ export async function POST(req: NextRequest) {
 
     const prompt = codeBlock`
       ${oneLine`
-        You are a very enthusiastic Supabase representative who loves
-        to help people! Given the following sections from the Supabase
+        You are a very enthusiastic Remix representative who loves
+        to help people! Given the following sections from the Remix
         documentation, answer the question using only that information,
         outputted in markdown format. If you are unsure and the answer
         is not explicitly written in the documentation, say
@@ -133,26 +132,30 @@ export async function POST(req: NextRequest) {
 
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 512,
+      messages: messages.concat({ role: 'user', content: prompt }),
+      // max_tokens: 512,
       temperature: 0,
       stream: true,
     })
 
 
-    const encoder = new TextEncoder()
+    // const encoder = new TextEncoder()
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        for await (const part of response) {
-          const content = part.choices[0].delta.content
-          const _content = encoder.encode(content!)
-          controller.enqueue(_content)
-        }
-      },
-    })
+    // const stream = new ReadableStream({
+    //   async start(controller) {
+    //     for await (const part of response) {
+    //       const content = part.choices[0].delta.content
+    //       const _content = encoder.encode(content!)
+    //       controller.enqueue(_content)
+    //     }
+    //   },
+    // })
 
-    return new Response(stream, { status: 200 })
+    // return new Response(stream, { status: 200 })
+    // Convert the response into a friendly text-stream
+    const stream = OpenAIStream(response)
+    // Respond with the stream
+    return new StreamingTextResponse(stream)
   } catch (err: unknown) {
     if (err instanceof UserError) {
       return new Response(

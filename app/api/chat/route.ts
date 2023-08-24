@@ -13,17 +13,14 @@ import { OpenAIStream, StreamingTextResponse } from 'ai'
 // import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { ApplicationError, UserError } from '@/lib/errors'
 import OpenAI from 'openai'
-import { HttpsProxyAgent } from 'https-proxy-agent'
 
 const openAiKey = process.env.OPENAI_KEY
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-const agent = new HttpsProxyAgent('http://localhost:8001')
 
 const openai = new OpenAI({
   apiKey: openAiKey,
-  httpAgent: agent,
 })
 
 const supabaseClient = createClient(supabaseUrl, supabaseServiceKey)
