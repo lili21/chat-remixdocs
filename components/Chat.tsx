@@ -1,7 +1,7 @@
 'use client'
 
 import { useChat } from 'ai/react'
-import Message from './Message'
+import ChatMessage from './ChatMessage'
 import { Input } from './ui/input'
 import { Send } from 'lucide-react'
 
@@ -14,7 +14,7 @@ export default function Chat() {
     <div className="w-full flex-1 relative">
       {messages.map((m) => (
         <div className="flex items-start gap-4 mb-4" key={m.id}>
-          <Message m={m} />
+          <ChatMessage m={m} />
         </div>
       ))}
 
