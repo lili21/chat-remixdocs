@@ -10,17 +10,26 @@ import { mdxFromMarkdown, MdxjsEsm } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { toString } from 'mdast-util-to-string'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import 'openai'
-import { Configuration, OpenAIApi } from 'openai'
+// import 'openai'
+// import { Configuration, OpenAIApi } from 'openai'
+import OpenAI from 'openai'
 import { basename, dirname, join } from 'path'
 import { u } from 'unist-builder'
 import { filter } from 'unist-util-filter'
 import { inspect } from 'util'
 import yargs from 'yargs'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 
 dotenv.config()
 
-const ignoredFiles = ['pages/404.mdx']
+const agent = new HttpsProxyAgent('http://localhost:8001')
+
+const openai = new OpenAI({
+  apiKey: process.env['OPENAI_KEY'],
+  httpAgent: agent,
+})
+
+const ignoredFiles = ['pages/404.mdx', 'pages/docs/guides/migrating-react-router-app.md']
 
 /**
  * Extracts ES literals from an `estree` `ObjectExpression`
@@ -74,7 +83,7 @@ function extractMetaExport(mdxTree: Root) {
       metaExportNode.data.estree.body[0].declaration.declarations[0]?.id.type === 'Identifier' &&
       metaExportNode.data.estree.body[0].declaration.declarations[0].id.name === 'meta' &&
       metaExportNode.data.estree.body[0].declaration.declarations[0].init?.type ===
-        'ObjectExpression' &&
+      'ObjectExpression' &&
       metaExportNode.data.estree.body[0].declaration.declarations[0].init) ||
     undefined
 
@@ -226,7 +235,7 @@ abstract class BaseEmbeddingSource {
   meta?: Meta
   sections?: Section[]
 
-  constructor(public source: string, public path: string, public parentPath?: string) {}
+  constructor(public source: string, public path: string, public parentPath?: string) { }
 
   abstract load(): Promise<{
     checksum: string
@@ -295,7 +304,7 @@ async function generateEmbeddings() {
   )
 
   const embeddingSources: EmbeddingSource[] = [
-    ...(await walk('pages'))
+    ...(await walk('pages/docs/utils'))
       .filter(({ path }) => /\.mdx?$/.test(path))
       .filter(({ path }) => !ignoredFiles.includes(path))
       .map((entry) => new MarkdownEmbeddingSource('guide', entry.path)),
@@ -420,21 +429,19 @@ async function generateEmbeddings() {
         const input = content.replace(/\n/g, ' ')
 
         try {
-          const configuration = new Configuration({
-            apiKey: process.env.OPENAI_KEY,
-          })
-          const openai = new OpenAIApi(configuration)
 
-          const embeddingResponse = await openai.createEmbedding({
+          const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
             input,
           })
 
-          if (embeddingResponse.status !== 200) {
-            throw new Error(inspect(embeddingResponse.data, false, 2))
-          }
+          console.log('embedding success')
 
-          const [responseData] = embeddingResponse.data.data
+          // if (embeddingResponse.status !== 200) {
+          //   throw new Error(inspect(embeddingResponse.data, false, 2))
+          // }
+
+          const [responseData] = embeddingResponse.data
 
           const { error: insertPageSectionError, data: pageSection } = await supabaseClient
             .from('nods_page_section')
@@ -443,7 +450,7 @@ async function generateEmbeddings() {
               slug,
               heading,
               content,
-              token_count: embeddingResponse.data.usage.total_tokens,
+              token_count: embeddingResponse.usage.total_tokens,
               embedding: responseData.embedding,
             })
             .select()
@@ -453,6 +460,8 @@ async function generateEmbeddings() {
           if (insertPageSectionError) {
             throw insertPageSectionError
           }
+
+          console.log('insert page section success')
         } catch (err) {
           // TODO: decide how to better handle failed embeddings
           console.error(
@@ -464,6 +473,10 @@ async function generateEmbeddings() {
 
           throw err
         }
+        // rate limit 3 / min
+        await new Promise(resolve => {
+          setTimeout(resolve, 20 * 1000)
+        })
       }
 
       // Set page checksum so that we know this page was stored successfully

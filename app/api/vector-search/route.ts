@@ -2,28 +2,32 @@ import type { NextRequest } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { codeBlock, oneLine } from 'common-tags'
 import GPT3Tokenizer from 'gpt3-tokenizer'
-import {
-  Configuration,
-  OpenAIApi,
-  CreateModerationResponse,
-  CreateEmbeddingResponse,
-  ChatCompletionRequestMessage,
-} from 'openai-edge'
-import { OpenAIStream, StreamingTextResponse } from 'ai'
+// import {
+//   Configuration,
+//   OpenAIApi,
+//   CreateModerationResponse,
+//   CreateEmbeddingResponse,
+//   ChatCompletionRequestMessage,
+// } from 'openai-edge'
+// import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { ApplicationError, UserError } from '@/lib/errors'
+import OpenAI from 'openai'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 
 const openAiKey = process.env.OPENAI_KEY
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-const config = new Configuration({
+const agent = new HttpsProxyAgent('http://localhost:8001')
+
+const openai = new OpenAI({
   apiKey: openAiKey,
+  httpAgent: agent,
 })
-const openai = new OpenAIApi(config)
 
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
-export default async function handler(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     if (!openAiKey) {
       throw new ApplicationError('Missing environment variable OPENAI_KEY')
@@ -36,8 +40,9 @@ export default async function handler(req: NextRequest) {
     if (!supabaseServiceKey) {
       throw new ApplicationError('Missing environment variable SUPABASE_SERVICE_ROLE_KEY')
     }
-
     const requestData = await req.json()
+
+    console.log('----- request data ---', requestData)
 
     if (!requestData) {
       throw new UserError('Missing request data')
@@ -53,32 +58,27 @@ export default async function handler(req: NextRequest) {
 
     // Moderate the content to comply with OpenAI T&C
     const sanitizedQuery = query.trim()
-    const moderationResponse: CreateModerationResponse = await openai
-      .createModeration({ input: sanitizedQuery })
-      .then((res) => res.json())
+    // const moderationResponse = await openai
+    //   .moderations.create({ input: sanitizedQuery })
 
-    const [results] = moderationResponse.results
+    // const [results] = moderationResponse.results
 
-    if (results.flagged) {
-      throw new UserError('Flagged content', {
-        flagged: true,
-        categories: results.categories,
-      })
-    }
+    // if (results.flagged) {
+    //   throw new UserError('Flagged content', {
+    //     flagged: true,
+    //     categories: results.categories,
+    //   })
+    // }
 
     // Create embedding from query
-    const embeddingResponse = await openai.createEmbedding({
+    const embeddingResponse = await openai.embeddings.create({
       model: 'text-embedding-ada-002',
       input: sanitizedQuery.replaceAll('\n', ' '),
     })
 
-    if (embeddingResponse.status !== 200) {
-      throw new ApplicationError('Failed to create embedding for question', embeddingResponse)
-    }
-
     const {
       data: [{ embedding }],
-    }: CreateEmbeddingResponse = await embeddingResponse.json()
+    } = embeddingResponse
 
     const { error: matchError, data: pageSections } = await supabaseClient.rpc(
       'match_page_sections',
@@ -131,29 +131,28 @@ export default async function handler(req: NextRequest) {
       Answer as markdown (including related code snippets if available):
     `
 
-    const chatMessage: ChatCompletionRequestMessage = {
-      role: 'user',
-      content: prompt,
-    }
-
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
-      messages: [chatMessage],
+      messages: [{ role: 'user', content: prompt }],
       max_tokens: 512,
       temperature: 0,
       stream: true,
     })
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new ApplicationError('Failed to generate completion', error)
-    }
 
-    // Transform the response into a readable stream
-    const stream = OpenAIStream(response)
+    const encoder = new TextEncoder()
 
-    // Return a StreamingTextResponse, which can be consumed by the client
-    return new StreamingTextResponse(stream)
+    const stream = new ReadableStream({
+      async start(controller) {
+        for await (const part of response) {
+          const content = part.choices[0].delta.content
+          const _content = encoder.encode(content!)
+          controller.enqueue(_content)
+        }
+      },
+    })
+
+    return new Response(stream, { status: 200 })
   } catch (err: unknown) {
     if (err instanceof UserError) {
       return new Response(

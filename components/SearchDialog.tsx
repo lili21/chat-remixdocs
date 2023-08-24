@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { useCompletion } from 'ai/react'
 import { X, Loader, User, Frown, CornerDownLeft, Search, Wand } from 'lucide-react'
+import MessageRender from './MessageRender'
 
 export function SearchDialog() {
   const [open, setOpen] = React.useState(false)
@@ -121,7 +122,7 @@ export function SearchDialog() {
                     <Wand width={18} className="text-white" />
                   </span>
                   <h3 className="font-semibold">Answer:</h3>
-                  {completion}
+                  <MessageRender>{completion}</MessageRender>
                 </div>
               ) : null}
 
@@ -134,9 +135,8 @@ export function SearchDialog() {
                   className="col-span-3"
                 />
                 <CornerDownLeft
-                  className={`absolute top-3 right-5 h-4 w-4 text-gray-300 transition-opacity ${
-                    query ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  className={`absolute top-3 right-5 h-4 w-4 text-gray-300 transition-opacity ${query ? 'opacity-100' : 'opacity-0'
+                    }`}
                 />
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-100">
