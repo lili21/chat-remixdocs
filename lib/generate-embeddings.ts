@@ -83,7 +83,7 @@ function extractMetaExport(mdxTree: Root) {
       metaExportNode.data.estree.body[0].declaration.declarations[0]?.id.type === 'Identifier' &&
       metaExportNode.data.estree.body[0].declaration.declarations[0].id.name === 'meta' &&
       metaExportNode.data.estree.body[0].declaration.declarations[0].init?.type ===
-      'ObjectExpression' &&
+        'ObjectExpression' &&
       metaExportNode.data.estree.body[0].declaration.declarations[0].init) ||
     undefined
 
@@ -235,7 +235,7 @@ abstract class BaseEmbeddingSource {
   meta?: Meta
   sections?: Section[]
 
-  constructor(public source: string, public path: string, public parentPath?: string) { }
+  constructor(public source: string, public path: string, public parentPath?: string) {}
 
   abstract load(): Promise<{
     checksum: string
@@ -336,37 +336,8 @@ async function generateEmbeddings() {
         throw fetchPageError
       }
 
-      type Singular<T> = T extends any[] ? undefined : T
-
       // We use checksum to determine if this page & its sections need to be regenerated
       if (!shouldRefresh && existingPage?.checksum === checksum) {
-        const existingParentPage = existingPage?.parentPage as Singular<
-          typeof existingPage.parentPage
-        >
-
-        // If parent page changed, update it
-        if (existingParentPage?.path !== parentPath) {
-          console.log(`[${path}] Parent page has changed. Updating to '${parentPath}'...`)
-          const { error: fetchParentPageError, data: parentPage } = await supabaseClient
-            .from('nods_page')
-            .select()
-            .filter('path', 'eq', parentPath)
-            .limit(1)
-            .maybeSingle()
-
-          if (fetchParentPageError) {
-            throw fetchParentPageError
-          }
-
-          const { error: updatePageError } = await supabaseClient
-            .from('nods_page')
-            .update({ parent_page_id: parentPage?.id })
-            .filter('id', 'eq', existingPage.id)
-
-          if (updatePageError) {
-            throw updatePageError
-          }
-        }
         continue
       }
 
@@ -429,7 +400,6 @@ async function generateEmbeddings() {
         const input = content.replace(/\n/g, ' ')
 
         try {
-
           const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
             input,
@@ -474,7 +444,7 @@ async function generateEmbeddings() {
           throw err
         }
         // rate limit 3 / min
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(resolve, 20 * 1000)
         })
       }
