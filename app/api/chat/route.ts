@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       const encoded = tokenizer.encode(content)
       tokenCount += encoded.text.length
 
-      if (tokenCount >= 1500) {
+      if (tokenCount >= 3000) {
         break
       }
 

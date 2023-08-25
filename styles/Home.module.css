@@ -3,9 +3,11 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding: 6rem;
-  padding-bottom: 12rem;
+  padding: 20px;
+  padding-bottom: 60px;
   min-height: 100vh;
+  width: 680px;
+  margin: auto;
 }
 
 .description {

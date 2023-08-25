@@ -4,24 +4,44 @@ import { useChat } from 'ai/react'
 import ChatMessage from './ChatMessage'
 import { Input } from './ui/input'
 import { Send } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     api: process.env.NODE_ENV === 'development' ? '/api/chat-dev' : '/api/chat',
   })
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!ref.current) {
+      return
+    }
+    const resiveObserve = new ResizeObserver((entries) => {
+      document.body.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: 'smooth',
+      })
+    })
+    resiveObserve.observe(ref.current)
+    return () => resiveObserve.disconnect()
+  }, [])
 
   return (
-    <div className="w-full flex-1 relative">
+    <div ref={ref} className="w-full flex-1 relative">
       {messages.map((m) => (
         <div className="flex items-start gap-4 mb-4" key={m.id}>
           <ChatMessage m={m} />
         </div>
       ))}
 
-      <form onSubmit={handleSubmit} className="fixed bottom-24 left-24 right-24">
+      <form
+        onSubmit={handleSubmit}
+        className="fixed"
+        style={{ width: '640px', left: '50%', bottom: '20px', transform: 'translateX(-50%)' }}
+      >
         <div className="relative">
           <Input
-            placeholder="Ask a question..."
+            placeholder="Ask a question about Remix"
             name="search"
             value={input}
             onChange={handleInputChange}

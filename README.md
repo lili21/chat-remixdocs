@@ -1,4 +1,3 @@
-#  Remix Chat
+# Chat with Remix Docs
 
 
-Chat with Remix Docs
