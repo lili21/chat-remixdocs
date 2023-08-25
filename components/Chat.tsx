@@ -6,10 +6,8 @@ import { Input } from './ui/input'
 import { Send } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
-export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: process.env.NODE_ENV === 'development' ? '/api/chat-dev' : '/api/chat',
-  })
+export default function Chat({ api }: { api: string }) {
+  const { messages, input, handleInputChange, handleSubmit } = useChat({ api })
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
