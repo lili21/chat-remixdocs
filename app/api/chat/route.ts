@@ -22,7 +22,7 @@ const openai = new OpenAI({
   apiKey: openAiKey,
 })
 
-// export const runtime = 'edge'
+export const runtime = 'edge'
 
 export async function POST(req: NextRequest) {
   try {
