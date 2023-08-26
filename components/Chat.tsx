@@ -3,11 +3,13 @@
 import { useChat } from 'ai/react'
 import ChatMessage from './ChatMessage'
 import { Input } from './ui/input'
+import { Button } from './ui/button'
+import { cn } from '@/lib/utils'
 import { Send } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
 export default function Chat({ api }: { api: string }) {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({ api })
+  const { messages, input, handleInputChange, handleSubmit, isLoading, stop } = useChat({ api })
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -34,9 +36,15 @@ export default function Chat({ api }: { api: string }) {
 
       <form
         onSubmit={handleSubmit}
-        className="fixed"
-        style={{ width: '640px', left: '50%', bottom: '20px', transform: 'translateX(-50%)' }}
+        className="fixed bottom-12"
+        style={{ width: '640px', left: '50%', transform: 'translateX(-50%)' }}
       >
+        <div className={cn('text-center mb-2', { hidden: !isLoading })}>
+          <Button size="sm" variant="outline" onClick={stop}>
+            Generating...
+          </Button>
+        </div>
+
         <div className="relative">
           <Input
             placeholder="Ask a question about Remix"
