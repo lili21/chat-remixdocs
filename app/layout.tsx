@@ -6,7 +6,7 @@ import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
   title: 'Chat With Remix Docs',
-  description: 'Ask question about Remix',
+  description: 'An AI powdered chatbot. with remix docs, you can ask question about Remix',
   viewport: 'width=device-width, initial-scale=1',
 }
 
