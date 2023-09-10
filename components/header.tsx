@@ -11,7 +11,7 @@ export function Header() {
       <div>
         <a
           target="_blank"
-          href="https://github.com/vercel/nextjs-ai-chatbot/"
+          href="https://github.com/lili21/chat-remixdocs"
           rel="noopener noreferrer"
         >
           <Github size={28} />
