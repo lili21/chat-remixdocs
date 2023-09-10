@@ -2,6 +2,7 @@ import { fontMono, fontSans } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import Header from '@/components/header'
 import { Metadata } from 'next'
+import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
   title: 'Chat With Remix Docs',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main className="flex flex-col flex-1 bg-muted/50">{children}</main>
         </div>
+        <Analytics />
       </body>
     </html>
   )
