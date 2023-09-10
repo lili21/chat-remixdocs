@@ -1,6 +1,6 @@
 import { fontMono, fontSans } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
-import Header from '@/components/header'
+import { Header } from '@/components/header'
 import { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/react'
 
