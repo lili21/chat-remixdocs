@@ -23,6 +23,8 @@
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.3",
     "@radix-ui/react-label": "^2.0.1",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-slot": "^1.0.2",
     "@supabase/supabase-js": "^2.13.0",
     "@types/node": "18.15.10",
     "@types/prismjs": "^1.26.0",
@@ -50,6 +52,7 @@
     "prismjs": "^1.29.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-intersection-observer": "^9.5.2",
     "react-markdown": "^8.0.7",
     "react-simple-code-editor": "^0.13.1",
     "tailwind-merge": "^1.10.0",
@@ -60,6 +63,7 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.10",
     "@types/common-tags": "^1.8.1",
     "@types/estree": "^1.0.0",
     "@types/mdast": "^3.0.11",

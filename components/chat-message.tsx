@@ -2,35 +2,38 @@ import ReactMarkdown from 'react-markdown'
 import Editor from 'react-simple-code-editor'
 import { highlight, languages } from 'prismjs'
 import { useState } from 'react'
-import { User } from 'lucide-react'
 import Image from 'next/image'
 import type { Message } from 'ai'
 import 'prismjs/components/prism-clike'
 import 'prismjs/components/prism-javascript'
 import 'prismjs/themes/prism.css' //Example style, you can use another
+import { cn } from '@/lib/utils'
+import { IconUser } from './ui/icons'
 
-export default function ChatMessage({ m }: { m: Message }) {
-  if (m.role === 'user') {
-    return (
-      <>
-        <User width={24} />
-        {m.content}
-      </>
-    )
-  } else {
-    return (
-      <>
-        <Image src="/remix.svg" width="24" height="24" alt="remix logo" />
-        <Content>{m.content}</Content>
-      </>
-    )
-  }
+export function ChatMessage({ message, ...props }: { message: Message }) {
+  return (
+    <div className={cn('group relative mb-4 flex items-start md:-ml-12')} {...props}>
+      <div
+        className={cn(
+          'flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-md border shadow',
+          message.role === 'user' ? 'bg-background' : 'bg-primary text-primary-foreground'
+        )}
+      >
+        {message.role === 'user' ? (
+          <IconUser />
+        ) : (
+          <Image src="/remix.svg" width="24" height="24" alt="remix logo" />
+        )}
+      </div>
+      <Content>{message.content}</Content>
+    </div>
+  )
 }
 
 function Content({ children }: { children: any }) {
   const [copied, setCopied] = useState(false)
   return (
-    <div className="flex-1 relative overflow-auto">
+    <div className="flex-1 px-1 ml-4 space-y-2">
       <ReactMarkdown
         components={{
           code({ node, inline, className, children, ...props }) {

@@ -1,48 +1,80 @@
 'use client'
 
 import { useChat } from 'ai/react'
-import ChatMessage from './ChatMessage'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
-import { cn } from '@/lib/utils'
 import { Send } from 'lucide-react'
+import { EmptyScreen } from './empty-screen'
+import { ChatList } from './chat-list'
+// import { ChatScrollAnchor } from './chat-scroll-anchor'
+import { IconStop, IconRefresh } from './ui/icons'
 import { useEffect, useRef } from 'react'
 
-export default function Chat({ api }: { api: string }) {
-  const { messages, input, handleInputChange, handleSubmit, isLoading, stop } = useChat({ api })
+export function Chat({ api }: { api: string }) {
+  const { messages, input, handleInputChange, append, handleSubmit, isLoading, stop, reload } =
+    useChat({
+      api,
+    })
+
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!ref.current) {
       return
     }
-    const resiveObserve = new ResizeObserver((entries) => {
-      document.body.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: 'smooth',
-      })
+
+    const resizeObserve = new ResizeObserver((entries) => {
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: 'smooth',
+        })
+      }, 100)
     })
-    resiveObserve.observe(ref.current)
-    return () => resiveObserve.disconnect()
+    resizeObserve.observe(ref.current)
+    return () => resizeObserve.disconnect()
   }, [])
 
   return (
-    <div ref={ref} className="w-full flex-1 relative">
-      {messages.map((m) => (
-        <div className="flex items-start gap-4 mb-4" key={m.id}>
-          <ChatMessage m={m} />
-        </div>
-      ))}
+    <>
+      <div ref={ref} className="pb-[150px] pt-4 md:pt-10">
+        {messages.length ? (
+          <>
+            <ChatList messages={messages} />
+            {/* <ChatScrollAnchor trackVisibility={isLoading} /> */}
+          </>
+        ) : (
+          <EmptyScreen
+            setInput={(v) => {
+              append({
+                role: 'user',
+                content: v,
+              })
+            }}
+          />
+        )}
+      </div>
 
       <form
+        method="post"
         onSubmit={handleSubmit}
         className="fixed bottom-12"
         style={{ width: '640px', left: '50%', transform: 'translateX(-50%)' }}
       >
-        <div className={cn('text-center mb-2', { hidden: !isLoading })}>
-          <Button size="sm" variant="outline" onClick={stop}>
-            Generating...
-          </Button>
+        <div className="flex h-10 items-center justify-center">
+          {isLoading ? (
+            <Button variant="outline" onClick={() => stop()} className="bg-background">
+              <IconStop className="mr-2" />
+              Stop generating
+            </Button>
+          ) : (
+            messages?.length > 0 && (
+              <Button variant="outline" onClick={() => reload()} className="bg-background">
+                <IconRefresh className="mr-2" />
+                Regenerate response
+              </Button>
+            )
+          )}
         </div>
 
         <div className="relative">
@@ -56,6 +88,6 @@ export default function Chat({ api }: { api: string }) {
           <Send className={`absolute top-3 right-5 h-4 w-4`} />
         </div>
       </form>
-    </div>
+    </>
   )
 }
