@@ -14,7 +14,7 @@ export function EmptyScreen({ setInput }: { setInput: (v: string) => void }) {
   return (
     <div className="mx-auto max-w-2xl px-4">
       <div className="rounded-lg border bg-background p-8">
-        <h1 className="mb-2 text-lg font-semibold">Welcome to Chat with Remix Docs!</h1>
+        <h1 className="mb-2 text-lg font-semibold">Welcome to Chat with Remix!</h1>
         <p className="leading-normal text-muted-foreground">
           You can ask quetion about Remix or try the following examples:
         </p>

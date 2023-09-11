@@ -5,9 +5,14 @@ import { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
-  title: 'Chat With Remix Docs',
-  description: 'An AI powdered chatbot. with remix docs, you can ask question about Remix',
+  title: 'Chat With Remix',
+  description: 'You can ask any question about Remix, powered by AI',
   viewport: 'width=device-width, initial-scale=1',
+  openGraph: {
+    title: 'Chat With Remix',
+    description: 'An AI powdered chatbot, you can ask any question about Remix',
+    images: ['/chat-remix-og.png']
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
