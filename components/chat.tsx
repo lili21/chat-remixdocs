@@ -63,15 +63,15 @@ export function Chat({ api }: { api: string }) {
       >
         <div className="flex h-10 items-center justify-center">
           {isLoading ? (
-            <Button variant="outline" onClick={() => stop()} className="bg-background">
+            <Button variant="outline" onClick={() => stop()} className="bg-background mb-2">
               <IconStop className="mr-2" />
-              Stop generating
+              Stop
             </Button>
           ) : (
             messages?.length > 0 && (
-              <Button variant="outline" onClick={() => reload()} className="bg-background">
+              <Button variant="outline" onClick={() => reload()} className="bg-background mb-2">
                 <IconRefresh className="mr-2" />
-                Regenerate response
+                Regenerate
               </Button>
             )
           )}
