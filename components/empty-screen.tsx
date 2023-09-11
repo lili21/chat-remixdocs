@@ -4,7 +4,11 @@ import { Button } from '@/components/ui/button'
 // import { ExternalLink } from '@/components/external-link'
 import { IconArrowRight } from '@/components/ui/icons'
 
-const exampleMessages = ['How to set headers', 'How to set meta', 'How to fetch data']
+const exampleMessages = [
+  'How do I handle multiple forms in one route?',
+  'How can I have structured data in a form?',
+  `What's the difference between CatchBoundary & ErrorBoundary?`,
+]
 
 export function EmptyScreen({ setInput }: { setInput: (v: string) => void }) {
   return (
