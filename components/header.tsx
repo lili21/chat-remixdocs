@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { Github, Share } from 'lucide-react'
+import { Github } from 'lucide-react'
 import { RemixLight } from './ui/icons'
-import { Button } from './ui/button'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { ShareButton } from './share'
 
 export function Header() {
   return (
@@ -11,19 +10,7 @@ export function Header() {
         <RemixLight />
       </a>
       <div className="flex items-center gap-4">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost">
-                <Share />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="left">
-              <p>Share chat</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
+        <ShareButton />
         <a
           target="_blank"
           href="https://github.com/lili21/chat-remixdocs"
