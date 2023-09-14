@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { shareChat } from '@/app/actions'
 import { copyShareLink, getMessages } from '@/lib/utils'
 import { Share } from 'lucide-react'
+import { nanoid } from '@/lib/utils'
 
 export function ShareButton() {
   return (
@@ -11,16 +12,17 @@ export function ShareButton() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            onClick={() => {
-              // const messages = getMessages()
-              // if (messages.length) {
-              //   const result = await shareChat(messages)
-              //   await copyShareLink(result.id)
-              //   toast({
-              //     title: 'Share link copied to clipboard',
-              //   })
-              // }
-              copyShareLink('12345')
+            onClick={async () => {
+              if (window.location.pathname.includes('share')) {
+                copyShareLink(window.location.href)
+              } else {
+                const messages = getMessages()
+                if (messages.length) {
+                  const id = nanoid()
+                  await shareChat(id, Date.now(), messages)
+                  copyShareLink(id)
+                }
+              }
             }}
             variant="ghost"
           >

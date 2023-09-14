@@ -1,18 +1,23 @@
-import { kv } from '@vercel/kv'
-import { Message, nanoid } from 'ai'
+'use server'
 
-interface Chat {
-  createAt: number
-  id: string
-  messages: Message[]
+import { kv } from '@vercel/kv'
+import { Message } from 'ai'
+
+export async function getChats() {
+  const result = await kv.scan(0, { type: 'hash', count: 10 })
+
+  return result
 }
 
-export async function shareChat(messages: Message[]) {
-  const id = nanoid()
+export async function getChat(id: string) {
+  const result = await kv.hgetall<{ messages: Message[] }>(`chat:${id}`)
+  return result
+}
 
+export async function shareChat(id: string, createAt: number, messages: Message[]) {
   const payload = {
     id,
-    createAt: Date.now,
+    createAt,
     messages,
   }
 

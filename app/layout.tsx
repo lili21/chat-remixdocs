@@ -4,6 +4,7 @@ import { Header } from '@/components/header'
 import { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/react'
 import { Toaster } from 'react-hot-toast'
+import '@/styles/globals.css'
 
 export const metadata: Metadata = {
   title: 'Chat With Remix',

@@ -30,7 +30,7 @@ export function Chat({ api }: { api: string }) {
           top: document.body.scrollHeight,
           behavior: 'smooth',
         })
-      }, 100)
+      }, 500)
     })
     resizeObserve.observe(ref.current)
     return () => resizeObserve.disconnect()
