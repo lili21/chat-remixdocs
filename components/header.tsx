@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Github } from 'lucide-react'
 import { RemixLight } from './ui/icons'
+import { ShareButton } from './share'
 
 export function Header() {
   return (
@@ -8,7 +9,8 @@ export function Header() {
       <a target="_blank" href="https://remix.run" rel="noopener noreferrer">
         <RemixLight />
       </a>
-      <div>
+      <div className="flex items-center gap-2">
+        <ShareButton />
         <a
           target="_blank"
           href="https://github.com/lili21/chat-remixdocs"

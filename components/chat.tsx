@@ -9,6 +9,7 @@ import { ChatList } from './chat-list'
 // import { ChatScrollAnchor } from './chat-scroll-anchor'
 import { IconStop, IconRefresh } from './ui/icons'
 import { useEffect, useRef } from 'react'
+import { setMessages } from '@/lib/utils'
 
 export function Chat({ api }: { api: string }) {
   const { messages, input, handleInputChange, append, handleSubmit, isLoading, stop, reload } =
@@ -29,11 +30,17 @@ export function Chat({ api }: { api: string }) {
           top: document.body.scrollHeight,
           behavior: 'smooth',
         })
-      }, 100)
+      }, 500)
     })
     resizeObserve.observe(ref.current)
     return () => resizeObserve.disconnect()
   }, [])
+
+  useEffect(() => {
+    if (!isLoading && messages.length) {
+      setMessages(messages)
+    }
+  }, [isLoading, messages])
 
   return (
     <>
