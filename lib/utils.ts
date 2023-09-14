@@ -27,5 +27,6 @@ export function copyShareLink(id: string) {
   const url = new URL(window.location.href)
   url.pathname = `/share/${id}`
   navigator.clipboard.writeText(url.toString())
+
   toast.success('Share link copied to clipboard')
 }
