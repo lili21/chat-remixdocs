@@ -12,9 +12,9 @@ import { useEffect, useRef } from 'react'
 import { setMessages } from '@/lib/utils'
 
 export function Chat({ api }: { api: string }) {
-  const { messages, input, handleInputChange, append, handleSubmit, isLoading, stop, reload } =
+  const { messages, input, append, handleInputChange, handleSubmit, isLoading, stop, reload } =
     useChat({
-      api,
+      api
     })
 
   const ref = useRef<HTMLDivElement>(null)
@@ -70,13 +70,13 @@ export function Chat({ api }: { api: string }) {
       >
         <div className="flex h-10 items-center justify-center">
           {isLoading ? (
-            <Button variant="outline" onClick={() => stop()} className="bg-background mb-2">
+            <Button type="button" variant="outline" onClick={() => stop()} className="bg-background mb-2">
               <IconStop className="mr-2" />
               Stop
             </Button>
           ) : (
             messages?.length > 0 && (
-              <Button variant="outline" onClick={() => reload()} className="bg-background mb-2">
+              <Button type="button" variant="outline" onClick={() => reload()} className="bg-background mb-2">
                 <IconRefresh className="mr-2" />
                 Regenerate
               </Button>

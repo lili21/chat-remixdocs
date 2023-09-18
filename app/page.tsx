@@ -1,6 +1,3 @@
-import '@/styles/globals.css'
-
-// import styles from '@/styles/Home.module.css'
 import { Chat } from '@/components/chat'
 
 export default function Home() {
