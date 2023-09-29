@@ -53,7 +53,7 @@ export function Chat({ api }: { api: string }) {
         content: q,
       })
     }
-  }, [searchParams, append])
+  }, [])
 
   return (
     <>
