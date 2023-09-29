@@ -10,11 +10,12 @@ import { ChatList } from './chat-list'
 import { IconStop, IconRefresh } from './ui/icons'
 import { useEffect, useRef } from 'react'
 import { setMessages } from '@/lib/utils'
+import { useSearchParams } from 'next/navigation'
 
 export function Chat({ api }: { api: string }) {
   const { messages, input, append, handleInputChange, handleSubmit, isLoading, stop, reload } =
     useChat({
-      api
+      api,
     })
 
   const ref = useRef<HTMLDivElement>(null)
@@ -41,6 +42,18 @@ export function Chat({ api }: { api: string }) {
       setMessages(messages)
     }
   }, [isLoading, messages])
+
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const q = searchParams?.get('q')
+    if (q) {
+      append({
+        role: 'user',
+        content: q,
+      })
+    }
+  }, [searchParams, append])
 
   return (
     <>
@@ -70,13 +83,23 @@ export function Chat({ api }: { api: string }) {
       >
         <div className="flex h-10 items-center justify-center">
           {isLoading ? (
-            <Button type="button" variant="outline" onClick={() => stop()} className="bg-background mb-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => stop()}
+              className="bg-background mb-2"
+            >
               <IconStop className="mr-2" />
               Stop
             </Button>
           ) : (
             messages?.length > 0 && (
-              <Button type="button" variant="outline" onClick={() => reload()} className="bg-background mb-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => reload()}
+                className="bg-background mb-2"
+              >
                 <IconRefresh className="mr-2" />
                 Regenerate
               </Button>
